@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}Detall de {{ t.treballador }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="mb-0">2. ℹ️ DETALL DEL TREBALLADOR: {{ t.treballador }}</h1>
+    <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">↩️ Tornar a la cerca (Opció 0)</a>
+</div>
+<hr>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card shadow mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Dades Actuals</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>ID:</strong> {{ t.id }}</p>
+                <p><strong>Plaça:</strong> {{ t.plaza }}</p>
+                <p><strong>Zona:</strong> {{ t.zona }}</p>
+                <p><strong>Contracte Fi:</strong> {{ t.contracte_fi if t.contracte_fi else 'Indefinit' }}</p>
+                <h4 class="mt-4">Rotació Actual: {{ t.rotacio }}</h4>
+                <p class="text-muted">
+                    {% if t.dies_treballats and t.dies_descans %}
+                        Cicle: {{ t.dies_treballats }} dies treballats / {{ t.dies_descans }} dies descans.
+                    {% else %}
+                        ⚠️ Rotació sense paràmetres definits.
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+
+        <div class="card shadow mb-4">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">3. 🔄 Canvi de Rotació</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('canviar_rotacio', treballador_id=t.id) }}" class="row g-3">
+                    <div class="col-md-9">
+                        <select class="form-select" name="nova_rotacio" required>
+                            <option value="" disabled selected>Selecciona una nova rotació...</option>
+                            {% for rotacio in rotacions_disponibles %}
+                                <option value="{{ rotacio }}" {% if rotacio == t.rotacio %}disabled{% endif %}>{{ rotacio }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <button type="submit" class="btn btn-primary w-100">Canviar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card shadow mb-4">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0">4. ✏️ Modificar Plaça, Zona o Contracte Fi</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('modificar_dades', treballador_id=t.id) }}" class="row g-3">
+                    <div class="col-md-6">
+                        <label for="nova_plaza" class="form-label">Nova Plaça</label>
+                        <input type="text" class="form-control" id="nova_plaza" name="nova_plaza" value="{{ t.plaza }}" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="nova_zona" class="form-label">Nova Zona</label>
+                        <input type="text" class="form-control" id="nova_zona" name="nova_zona" value="{{ t.zona }}" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="contracte_fi" class="form-label">Contracte Fi (YYYY-MM-DD)</label>
+                        <input type="date" class="form-control" id="contracte_fi" name="contracte_fi" value="{{ t.contracte_fi if t.contracte_fi else '' }}">
+                    </div>
+                    <div class="col-md-6 d-flex align-items-end">
+                        <button type="submit" class="btn btn-warning w-100">Actualitzar Dades</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="card shadow mb-4 border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0">5. 🗑️ Eliminar Treballador</h5>
+            </div>
+            <div class="card-body">
+                <p>⚠️ Aquesta acció es permanent i esborrarà també tots els descansos associats.</p>
+                <form method="POST" action="{{ url_for('eliminar_treballador_web', treballador_id=t.id) }}" onsubmit="return confirm('ATENCIÓ: Estàs segur que vols eliminar definitivament {{ t.treballador }} i tots els seus registres?');">
+                    <button type="submit" class="btn btn-danger w-100">ELIMINAR TREBALLADOR COMPLETAMENT</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

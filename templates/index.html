@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Cerca Treballador{% endblock %}
+
+{% block content %}
+<div class="card shadow mb-4">
+    <div class="card-header bg-success text-white">
+        <h5 class="mb-0">1. 🔍 Cerca Treballador (Nom, ID o Plaça)</h5>
+    </div>
+    <div class="card-body">
+        <form method="POST" action="{{ url_for('index') }}" class="row g-3">
+            <div class="col-md-10">
+                <input type="text" class="form-control" id="cerca" name="cerca" placeholder="Ex: Joan, 101, Tècnic B" value="{{ terme_cerca }}" required>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">Cercar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<h2 class="mt-4">📋 Treballadors Trobats:</h2>
+{% if resultats %}
+<div class="list-group">
+    {% for t in resultats %}
+    <a href="{{ url_for('veure_treballador', treballador_id=t.id) }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+        <div>
+            <strong>{{ t.treballador }}</strong> 
+            <small class="text-muted">(ID: {{ t.id }}) - {{ t.plaza }} - Rotació: {{ t.rotacio }}</small>
+            {% if t.contracte_fi %}
+                <span class="badge bg-danger">Contracte fi: {{ t.contracte_fi }}</span>
+            {% endif %}
+        </div>
+        <span class="badge bg-success rounded-pill">➡️ Veure Detall (Opció 2)</span>
+    </a>
+    {% endfor %}
+</div>
+{% else %}
+<div class="alert alert-info">
+    No s'han trobat resultats. Prova a introduir un terme de cerca.
+</div>
+{% endif %}
+
+{% endblock %}
